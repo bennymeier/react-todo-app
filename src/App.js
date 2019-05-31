@@ -14,6 +14,8 @@ class App extends React.Component {
     const todos = [];
     Object.keys(localStorage).forEach((key) => todos.push({ key, ...JSON.parse(localStorage.getItem(key)) }));
     this.state = { todos: [...todos] };
+    console.log(this.state);
+
   }
   render() {
     return (
@@ -23,11 +25,11 @@ class App extends React.Component {
         <button className="add-btn" onClick={this.add.bind(this)}> <span role="img" aria-label="Handshake">👋🏻</span></button>
         <h2>Open Todos</h2>
         <ul>
-          {this.state.todos.map((todo) => !todo.isDone ? <Todo addClickHandler={this.done.bind(this)} id={todo.key} key={todo.key} todo={todo.text} datetime={todo.datetime} /> : undefined)}
+          {this.state.todos.map((todo) => !todo.isDone ? <Todo addClickHandler={() => this.done(todo.key)} id={todo.key} key={`${todo.key}_open`} todo={todo.text} datetime={todo.datetime} /> : undefined)}
         </ul>
         <h2>Completed Todos</h2>
         <ul>
-          {this.state.todos.map((todo) => todo.isDone ? <Todo id={todo.key} key={todo.key} todo={todo.text} /> : undefined)}
+          {this.state.todos.map((todo) => todo.isDone ? <Todo addClickHandler={() => this.deleteFromLocalStorage(todo.key)} id={todo.key} key={`${todo.key}_done`} todo={todo.text} /> : undefined)}
         </ul>
       </div>
     );
@@ -47,14 +49,16 @@ class App extends React.Component {
     this.setState({ todos: [...this.state.todos, todoWithKey] }, async () => await this.addToLocalStorage(key, todo));
     this.todoField.value = "";
   }
-  async done(e) {
-    const key = e.target.getAttribute("data-key");
+  async done(key) {
+    // const key = e.target.getAttribute("data-key");
     let todos = [...this.state.todos];
     for (const todo of todos) {
       if (todo.key === key) {
         todo.isDone = true;
         await this.updateLocalStorage(todo.key, todo);
-        this.setState({ todos: [...todos] });
+        console.log("1: ", this.state);
+        this.setState((prev) => ({ todos: [...prev.todos] }));
+        console.log("2: ", this.state);
       }
     }
   }
@@ -65,14 +69,18 @@ class App extends React.Component {
     });
   }
   updateLocalStorage(key, todo) {
+    console.log(todo);
     return new Promise((resolve) => {
       if (todo.key) delete todo.key;
       localStorage.setItem(key, JSON.stringify(todo));
       resolve();
     });
   }
-  deleteFromLocalStorage() {
-
+  deleteFromLocalStorage(e) {
+    return new Promise((resolve) => {
+      const key = e.target.getAttribute("data-key");
+      if (key) localStorage.removeItem(key);
+    });
   }
   uniqueId() {
     const ID_LENGTH = 36;
