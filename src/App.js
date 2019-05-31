@@ -19,11 +19,11 @@ class App extends React.Component {
     return (
       <div className="container">
         <h1>Add todos <span role="img" aria-label="Document">📝</span></h1>
-        <input className="todo-input" onKeyDown={this.checkKey.bind(this)} placeholder="Your todo..." type="text" id="addTodo" />
-        <button className="add-btn" onClick={this.addTodo.bind(this)}> <span role="img" aria-label="Handshake">👋🏻</span></button>
+        <input className="todo-input" onKeyDown={this.checkKey.bind(this)} placeholder="Your todo..." type="text" id="add" />
+        <button className="add-btn" onClick={this.add.bind(this)}> <span role="img" aria-label="Handshake">👋🏻</span></button>
         <h2>Open Todos</h2>
         <ul>
-          {this.state.todos.map((todo) => !todo.isDone ? <Todo addClickHandler={this.setToDone.bind(this)} id={todo.key} key={todo.key} todo={todo.text} datetime={todo.datetime} /> : undefined)}
+          {this.state.todos.map((todo) => !todo.isDone ? <Todo addClickHandler={this.done.bind(this)} id={todo.key} key={todo.key} todo={todo.text} datetime={todo.datetime} /> : undefined)}
         </ul>
         <h2>Completed Todos</h2>
         <ul>
@@ -33,29 +33,27 @@ class App extends React.Component {
     );
   }
   componentDidMount() {
-    this.todoField = document.getElementById("addTodo");
+    this.todoField = document.getElementById("add");
   }
   checkKey(e) {
     if (e.key === "Enter" || e.keyCode === 13) {
-      this.addTodo();
+      this.add();
     }
   }
-  async addTodo() {
+  async add() {
     const todo = { text: this.todoField.value, datetime: new Date().toLocaleString(), isDone: false };
-    const key = this.uniqeId();
+    const key = this.uniqueId();
     const todoWithKey = { ...todo, key }
     this.setState({ todos: [...this.state.todos, todoWithKey] }, async () => await this.addToLocalStorage(key, todo));
     this.todoField.value = "";
   }
-  async setToDone(e) {
+  async done(e) {
     const key = e.target.getAttribute("data-key");
     let todos = [...this.state.todos];
     for (const todo of todos) {
       if (todo.key === key) {
         todo.isDone = true;
-        console.log("1: ", todos);
         await this.updateLocalStorage(todo.key, todo);
-        console.log("2: ", todos);
         this.setState({ todos: [...todos] });
       }
     }
@@ -76,7 +74,7 @@ class App extends React.Component {
   deleteFromLocalStorage() {
 
   }
-  uniqeId() {
+  uniqueId() {
     const ID_LENGTH = 36;
     const START_LETTERS_ASCII = 97; // Use 64 for uppercase
     const ALPHABET_LENGTH = 26;
