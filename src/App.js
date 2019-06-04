@@ -56,14 +56,11 @@ class App extends React.Component {
     return new Promise(async (resolve, reject) => {
       if (!key) reject(`key is ${key}`);
       let todos = [...this.state.todos];
-      for (const todo of todos) {
-        if (todo.key === key) {
-          todo.isDone = true;
-          await this.updateLocalStorage(todo.key, todo);
-          this.setState((prev) => ({ todos: [...prev.todos] }));
-          resolve();
-        }
-      }
+      const currentTodo = todos.filter((todo) => todo.key === key);
+      currentTodo[0].isDone = true;
+      await this.updateLocalStorage(currentTodo[0].key, currentTodo[0]);
+      this.setState((prev) => ({ todos: [...prev.todos] }));
+      resolve();
     });
   }
   delete(key) {
