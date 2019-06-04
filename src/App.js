@@ -8,6 +8,9 @@ const Todo = (props) => {
     </li>
   );
 }
+const DeleteAllBtn = (props) => {
+  return (<button onClick={props.addDeleteHandler} className="btn btn-secondary btn-block btn-lg">Delete all todos!</button>);
+};
 class App extends React.Component {
   constructor() {
     super();
@@ -31,6 +34,7 @@ class App extends React.Component {
         <ul>
           {this.state.todos.map((todo) => todo.isDone && <Todo addClickHandler={() => this.deleteFromLocalStorage(todo.key)} key={`${todo.key}_done`} todo={todo.text} datetime={todo.datetime} />)}
         </ul>
+        <DeleteAllBtn addDeleteHandler={() => this.deleteAll()} />
       </div>
     );
   }
@@ -42,15 +46,35 @@ class App extends React.Component {
       this.add();
     }
   }
-  async add() {
+  async deleteAll() {
+    try {
+      await this.deleteStorage();
+      this.setState({ todos: [] });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  deleteStorage() {
     return new Promise((resolve) => {
+      localStorage.clear();
+      resolve();
+    });
+  }
+  validateInput() {
+    return this.todoField.current.value.length > 0;
+  }
+  async add() {
+    return new Promise((resolve, reject) => {
+      if (!this.validateInput()) {
+        return reject("Todo is missing!");
+      }
       const todo = { text: this.todoField.current.value, datetime: new Date().toLocaleString(), isDone: false };
       const key = this.uniqueId();
       const todoWithKey = { ...todo, key }
       this.setState({ todos: [...this.state.todos, todoWithKey] }, async () => await this.addToLocalStorage(key, todo));
       this.clearInput();
       resolve();
-    });
+    }).catch((err) => console.error(err));
   }
   async done(key) {
     return new Promise(async (resolve, reject) => {
