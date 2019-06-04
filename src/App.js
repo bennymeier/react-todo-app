@@ -3,8 +3,8 @@ import './App.css';
 
 const Todo = (props) => {
   return (
-    <li data-key={props.id} onClick={props.addClickHandler}>{props.todo}
-      <span data-key={props.id} className="date-and-time">{props.datetime}</span>
+    <li onClick={props.addClickHandler}>{props.todo}
+      <span className="date-and-time">{props.datetime}</span>
     </li>
   );
 }
@@ -25,11 +25,11 @@ class App extends React.Component {
         <button className="add-btn" onClick={this.add.bind(this)}> <span role="img" aria-label="Handshake">👋🏻</span></button>
         <h2>Open Todos</h2>
         <ul>
-          {this.state.todos.map((todo) => !todo.isDone ? <Todo addClickHandler={() => this.done(todo.key)} id={todo.key} key={`${todo.key}_open`} todo={todo.text} datetime={todo.datetime} /> : undefined)}
+          {this.state.todos.map((todo) => !todo.isDone && <Todo addClickHandler={() => this.done(todo.key)} key={`${todo.key}_open`} todo={todo.text} datetime={todo.datetime} />)}
         </ul>
         <h2>Completed Todos</h2>
         <ul>
-          {this.state.todos.map((todo) => todo.isDone ? <Todo addClickHandler={() => this.deleteFromLocalStorage(todo.key)} id={todo.key} key={`${todo.key}_done`} todo={todo.text} /> : undefined)}
+          {this.state.todos.map((todo) => todo.isDone && <Todo addClickHandler={() => this.deleteFromLocalStorage(todo.key)} key={`${todo.key}_done`} todo={todo.text} />)}
         </ul>
       </div>
     );
