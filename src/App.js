@@ -29,7 +29,7 @@ class App extends React.Component {
         </ul>
         <h2>Completed Todos</h2>
         <ul>
-          {this.state.todos.map((todo) => todo.isDone && <Todo addClickHandler={() => this.deleteFromLocalStorage(todo.key)} key={`${todo.key}_done`} todo={todo.text} />)}
+          {this.state.todos.map((todo) => todo.isDone && <Todo addClickHandler={() => this.deleteFromLocalStorage(todo.key)} key={`${todo.key}_done`} todo={todo.text} datetime={todo.datetime} />)}
         </ul>
       </div>
     );
